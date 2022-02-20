@@ -13,7 +13,31 @@ class TodoElement {
 	}
 }
 
-let list = [];
+class TodoListElement {
+	todos;
+	constructor() {
+		this.todos = [];
+		let oldList = localStorage.getItem('todos');
+		if (oldList) {
+			this.todos = JSON.parse(oldList);
+			render(this.todos);
+		}
+	}
+
+	removeElement(id) {
+		this.todos = this.todos.filter((todo) => todo.id !== id);
+	}
+
+	addElement(todo) {
+		this.todos.push(todo);
+	}
+}
+
+let list = new TodoListElement();
+
+setInterval(() => {
+	localStorage.setItem('todos', JSON.stringify(list.todos));
+}, 1000);
 
 //  VIEW
 function buildTodoElement(todoObject) {
@@ -31,7 +55,7 @@ function buildTodoElement(todoObject) {
 
 	const dBtn = document.createElement('button');
 	dBtn.addEventListener('click', (event) => {
-		list = list.filter((todo) => todo.id !== todoObject.id);
+		list.removeElement(todoObject.id);
 		render(list);
 	});
 
@@ -60,9 +84,9 @@ function eventAddTodo() {
 	if (userInput.value === '') {
 		return;
 	} else {
-		list.push(new TodoElement(userInput.value, false));
+		list.addElement(new TodoElement(userInput.value, false));
 		userInput.value = '';
-		render(list);
+		render(list.todos);
 	}
 }
 
